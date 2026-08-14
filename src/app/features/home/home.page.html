@@ -1,0 +1,67 @@
+<app-hero />
+
+<!-- New arrivals -->
+<section class="shell py-20 lg:py-28" appReveal>
+  <app-section-heading
+    eyebrow="Just landed"
+    heading="New Arrivals"
+    description="The first pieces of the season — cut close to the body of the collection and made in small runs."
+    linkPath="/new-arrivals"
+    linkLabel="View all"
+  />
+
+  <div class="mt-14 lg:mt-16">
+    <app-product-grid
+      [products]="newArrivals()"
+      [loading]="newArrivalsLoading()"
+      [skeletonCount]="8"
+      [eagerFirstRow]="true"
+      emptyTitle="New pieces are on their way"
+      emptyBody="The next drop lands shortly. Join the list to hear about it first."
+    />
+  </div>
+</section>
+
+<!-- Assurances -->
+<section class="border-y border-ink/10 bg-cream" appReveal>
+  <div class="shell grid gap-10 py-12 sm:grid-cols-3 lg:py-14">
+    @for (item of assurances; track item.title) {
+      <div>
+        <p class="font-sans text-[0.6875rem] uppercase tracking-[0.22em] text-ink">
+          {{ item.title }}
+        </p>
+        <p class="mt-2.5 font-sans text-sm text-stone">{{ item.body }}</p>
+      </div>
+    }
+  </div>
+</section>
+
+<!-- Gender editorials -->
+<app-editorial-panel [panel]="menPanel" />
+<app-editorial-panel [panel]="womenPanel" [reverse]="true" />
+
+<!-- Featured campaign -->
+<app-campaign />
+
+<!-- Trending -->
+<section class="shell py-20 lg:py-28" appReveal>
+  <app-section-heading
+    eyebrow="Moving fast"
+    heading="Trending Now"
+    description="What the showroom is reaching for this week."
+    linkPath="/shop"
+    linkLabel="Shop all"
+  />
+
+  <div class="mt-14 lg:mt-16">
+    <app-product-rail [products]="trending()" [loading]="trendingLoading()" />
+  </div>
+</section>
+
+<!-- Brand story -->
+<div class="bg-paper">
+  <app-brand-story />
+</div>
+
+<!-- Newsletter -->
+<app-newsletter-section />

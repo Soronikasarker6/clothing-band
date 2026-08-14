@@ -1,0 +1,235 @@
+@if (loading()) {
+  <div class="shell grid gap-12 py-16 lg:grid-cols-12 lg:gap-16 lg:py-24">
+    <div class="animate-pulse lg:col-span-7">
+      <div class="aspect-[3/4] w-full bg-linen"></div>
+    </div>
+    <div class="animate-pulse space-y-4 lg:col-span-5">
+      <div class="h-2 w-20 bg-linen"></div>
+      <div class="h-8 w-2/3 bg-linen"></div>
+      <div class="h-4 w-24 bg-linen"></div>
+      <div class="h-24 w-full bg-linen"></div>
+    </div>
+  </div>
+} @else if (notFound()) {
+  <div class="shell py-32 text-center">
+    <p class="eyebrow">404</p>
+    <h1 class="mt-5 font-display text-display-sm text-ink">We couldn't find that piece</h1>
+    <p class="mx-auto mt-4 max-w-sm font-sans text-sm text-stone">
+      It may have sold out or moved. Browse the collection to find something close.
+    </p>
+    <a routerLink="/shop" class="btn-solid mt-10">Browse the collection</a>
+  </div>
+} @else if (product(); as item) {
+  <article class="pb-24">
+    <div class="shell py-8 lg:py-10">
+      <nav aria-label="Breadcrumb">
+        <ol
+          class="flex flex-wrap items-center gap-2 font-sans text-[0.6875rem] uppercase
+            tracking-[0.18em] text-stone"
+        >
+          <li><a routerLink="/" class="link-underline">Home</a></li>
+          <li aria-hidden="true">/</li>
+          <li>
+            <a [routerLink]="['/', item.gender]" class="link-underline">
+              {{ item.gender === 'men' ? 'Men' : 'Women' }}
+            </a>
+          </li>
+          <li aria-hidden="true">/</li>
+          <li class="text-ink">{{ item.name }}</li>
+        </ol>
+      </nav>
+    </div>
+
+    <div class="shell grid gap-10 lg:grid-cols-12 lg:gap-16">
+      <!-- Gallery -->
+      <div class="lg:col-span-7">
+        <div class="grid gap-3 lg:gap-4">
+          @for (shot of gallery(); track shot.url; let i = $index) {
+            <div
+              class="aspect-[3/4] w-full overflow-hidden bg-cream"
+            >
+              <img
+                [src]="shot.url"
+                [alt]="shot.alt"
+                [attr.loading]="i === 0 ? 'eager' : 'lazy'"
+                [appImageFallback]="item.slug + '-' + (i + 1)"
+                class="h-full w-full object-cover"
+              />
+            </div>
+          }
+        </div>
+      </div>
+
+      <!-- Details -->
+      <div class="lg:col-span-5">
+        <div class="lg:sticky lg:top-28">
+          <p class="eyebrow">{{ item.categoryName }}</p>
+          <h1 class="mt-4 font-display text-3xl leading-tight text-ink lg:text-4xl">
+            {{ item.name }}
+          </h1>
+
+          <div class="mt-5 flex flex-wrap items-center gap-x-5 gap-y-2">
+            <div class="flex items-baseline gap-3 font-sans">
+              @if (item.salePrice) {
+                <span class="text-lg text-clay">{{ item.salePrice | money }}</span>
+                <span class="text-sm text-stone line-through">{{ item.price | money }}</span>
+              } @else {
+                <span class="text-lg text-charcoal">{{ item.price | money }}</span>
+              }
+            </div>
+            <app-rating [value]="item.rating" [reviewCount]="item.reviewCount" />
+          </div>
+
+          <p class="mt-6 max-w-md font-sans text-sm leading-relaxed text-slate">
+            {{ item.description }}
+          </p>
+
+          <div class="mt-10">
+            <p class="eyebrow mb-4">Colour — {{ selectedColorName() }}</p>
+            <app-color-selector [colors]="item.colors" [(selected)]="color" />
+          </div>
+
+          <div class="mt-10">
+            <app-size-selector
+              [sizes]="item.sizes"
+              [(selected)]="size"
+              [unavailable]="unavailableSizes()"
+              (guideRequested)="showSizeGuide.set(!showSizeGuide())"
+            />
+            @if (showSizeGuide()) {
+              <div class="animate-fade-in mt-5 border border-ink/12 p-5">
+                <p class="eyebrow">Size guide</p>
+                <table class="mt-4 w-full font-sans text-xs text-slate">
+                  <caption class="sr-only">Body measurements in centimetres</caption>
+                  <thead>
+                    <tr class="text-left text-stone">
+                      <th scope="col" class="pb-2 font-normal">Size</th>
+                      <th scope="col" class="pb-2 font-normal">Chest</th>
+                      <th scope="col" class="pb-2 font-normal">Waist</th>
+                      <th scope="col" class="pb-2 font-normal">Hip</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-ink/8">
+                    <tr><td class="py-2">XS</td><td>82</td><td>66</td><td>90</td></tr>
+                    <tr><td class="py-2">S</td><td>88</td><td>72</td><td>96</td></tr>
+                    <tr><td class="py-2">M</td><td>94</td><td>78</td><td>102</td></tr>
+                    <tr><td class="py-2">L</td><td>100</td><td>84</td><td>108</td></tr>
+                    <tr><td class="py-2">XL</td><td>108</td><td>92</td><td>116</td></tr>
+                    <tr><td class="py-2">XXL</td><td>116</td><td>100</td><td>124</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            }
+          </div>
+
+          <div class="mt-10 flex flex-wrap items-center gap-4">
+            <app-quantity-selector
+              [(quantity)]="quantity"
+              [max]="maxQuantity()"
+              [label]="item.name"
+            />
+            <p class="font-sans text-xs text-stone">
+              @if (item.stock === 0) {
+                Sold out
+              } @else if (size() && maxQuantity() <= 3) {
+                Only {{ maxQuantity() }} left in this size
+              } @else {
+                In stock — ships within 24 hours
+              }
+            </p>
+          </div>
+
+          <div class="mt-8 flex flex-col gap-3">
+            <button
+              type="button"
+              class="btn-solid w-full"
+              [disabled]="!size() || item.stock === 0"
+              (click)="addToCart()"
+            >
+              {{ size() ? 'Add to bag' : 'Select a size' }}
+            </button>
+            <div class="flex gap-3">
+              <button
+                type="button"
+                class="btn-outline flex-1"
+                [disabled]="!size() || item.stock === 0"
+                (click)="buyNow()"
+              >
+                Buy now
+              </button>
+              <button
+                type="button"
+                class="btn-outline w-14 shrink-0 px-0"
+                [attr.aria-pressed]="saved()"
+                [attr.aria-label]="(saved() ? 'Remove from' : 'Save to') + ' wishlist'"
+                (click)="toggleWishlist()"
+              >
+                <i-lucide [img]="icons.heart" [class]="saved() ? 'h-4 w-4 fill-ink' : 'h-4 w-4'" />
+              </button>
+            </div>
+          </div>
+
+          <!-- Product information -->
+          <dl class="mt-12 divide-y divide-ink/10 border-y border-ink/10">
+            @for (panel of panels; track panel.id) {
+              <div>
+                <dt>
+                  <button
+                    type="button"
+                    class="flex w-full items-center justify-between py-5 text-left font-sans
+                      text-[0.6875rem] uppercase tracking-[0.2em] text-ink"
+                    (click)="togglePanel(panel.id)"
+                    [attr.aria-expanded]="openPanel() === panel.id"
+                  >
+                    {{ panel.label }}
+                    <i-lucide
+                      [img]="icons.chevronDown"
+                      class="h-4 w-4 transition-transform duration-300"
+                      [class.rotate-180]="openPanel() === panel.id"
+                    />
+                  </button>
+                </dt>
+                @if (openPanel() === panel.id) {
+                  <dd class="animate-fade-in pb-6 font-sans text-sm leading-relaxed text-slate">
+                    @switch (panel.id) {
+                      @case ('details') {
+                        <ul class="space-y-2">
+                          <li><span class="text-stone">Material —</span> {{ item.details.material }}</li>
+                          <li><span class="text-stone">Fit —</span> {{ item.details.fit }}</li>
+                          <li><span class="text-stone">SKU —</span> {{ item.sku }}</li>
+                        </ul>
+                      }
+                      @case ('care') {
+                        <ul class="space-y-2">
+                          @for (line of item.details.care; track line) {
+                            <li>{{ line }}</li>
+                          }
+                        </ul>
+                      }
+                      @case ('shipping') {
+                        <p>{{ item.details.shipping }}</p>
+                      }
+                      @case ('returns') {
+                        <p>{{ item.details.returns }}</p>
+                      }
+                    }
+                  </dd>
+                }
+              </div>
+            }
+          </dl>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related -->
+    @if (related().length > 0) {
+      <section class="shell pt-24 lg:pt-32" appReveal>
+        <h2 class="font-display text-display-sm text-ink">You May Also Like</h2>
+        <div class="mt-12">
+          <app-product-grid [products]="related()" />
+        </div>
+      </section>
+    }
+  </article>
+}

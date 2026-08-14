@@ -1,0 +1,151 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[60]" role="dialog" aria-modal="true" aria-label="Shopping bag">
+    <button
+      type="button"
+      class="animate-fade-in absolute inset-0 h-full w-full cursor-default bg-ink/40"
+      (click)="close()"
+      aria-label="Close bag"
+    ></button>
+
+    <aside
+      class="absolute inset-y-0 right-0 flex w-full max-w-md flex-col bg-paper
+        motion-safe:animate-[fade-in_0.4s_var(--ease-editorial)_both]"
+    >
+      <header class="flex items-center justify-between border-b border-ink/10 px-6 py-5">
+        <h2 class="font-sans text-[0.6875rem] uppercase tracking-[0.22em] text-ink">
+          Shopping bag ({{ totals().itemCount }})
+        </h2>
+        <button
+          type="button"
+          class="-mr-2 grid h-10 w-10 place-items-center text-ink transition-colors hover:bg-cream"
+          (click)="close()"
+          aria-label="Close bag"
+        >
+          <i-lucide [img]="icons.close" class="h-4 w-4" />
+        </button>
+      </header>
+
+      @if (lines().length === 0) {
+        <div class="flex flex-1 flex-col items-center justify-center gap-5 px-8 text-center">
+          <i-lucide [img]="icons.bag" class="h-7 w-7 text-ash" />
+          <div>
+            <p class="font-display text-2xl text-ink">Your bag is empty</p>
+            <p class="mt-2 font-sans text-sm text-stone">
+              Pieces you add will appear here.
+            </p>
+          </div>
+          <a routerLink="/shop" (click)="close()" class="btn-solid">Start shopping</a>
+        </div>
+      } @else {
+        @if (remainingForFreeShipping() > 0) {
+          <p class="bg-cream px-6 py-3 text-center font-sans text-xs text-slate">
+            {{ remainingForFreeShipping() | money }} away from complimentary shipping
+          </p>
+        }
+
+        <ul class="flex-1 divide-y divide-ink/8 overflow-y-auto px-6">
+          @for (line of lines(); track line.key) {
+            <li class="flex gap-4 py-6">
+              <a [routerLink]="['/product', line.slug]" (click)="close()" class="shrink-0">
+                <img
+                  [src]="line.image"
+                  [alt]="line.name"
+                  [appImageFallback]="line.slug + '-1'"
+                  class="aspect-[3/4] w-20 bg-cream object-cover"
+                />
+              </a>
+
+              <div class="flex flex-1 flex-col">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="eyebrow">{{ line.categoryName }}</p>
+                    <a
+                      [routerLink]="['/product', line.slug]"
+                      (click)="close()"
+                      class="link-underline mt-1.5 block font-sans text-sm text-ink"
+                      >{{ line.name }}</a
+                    >
+                    <p class="mt-1 font-sans text-xs text-stone">
+                      {{ line.colorName }} · {{ line.size }}
+                    </p>
+                  </div>
+                  <span class="font-sans text-sm text-charcoal">
+                    {{ line.unitPrice * line.quantity | money }}
+                  </span>
+                </div>
+
+                <div class="mt-auto flex items-center justify-between pt-4">
+                  <div class="inline-flex items-center border border-ink/15">
+                    <button
+                      type="button"
+                      class="grid h-8 w-8 place-items-center text-ink transition-colors
+                        hover:bg-cream"
+                      (click)="decrement(line.key)"
+                      [attr.aria-label]="'Decrease quantity of ' + line.name"
+                    >
+                      <i-lucide [img]="icons.minus" class="h-3 w-3" />
+                    </button>
+                    <span class="w-8 text-center font-sans text-xs tabular-nums">{{
+                      line.quantity
+                    }}</span>
+                    <button
+                      type="button"
+                      class="grid h-8 w-8 place-items-center text-ink transition-colors
+                        hover:bg-cream disabled:text-ash"
+                      [disabled]="line.quantity >= line.maxQuantity"
+                      (click)="increment(line.key)"
+                      [attr.aria-label]="'Increase quantity of ' + line.name"
+                    >
+                      <i-lucide [img]="icons.plus" class="h-3 w-3" />
+                    </button>
+                  </div>
+
+                  <button
+                    type="button"
+                    class="font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-stone
+                      underline underline-offset-4 transition-colors hover:text-ink"
+                    (click)="remove(line.key)"
+                  >
+                    Remove
+                  </button>
+                </div>
+              </div>
+            </li>
+          }
+        </ul>
+
+        <footer class="border-t border-ink/10 px-6 py-6">
+          <dl class="space-y-2.5 font-sans text-sm">
+            <div class="flex justify-between">
+              <dt class="text-stone">Subtotal</dt>
+              <dd class="text-charcoal">{{ totals().subtotal | money }}</dd>
+            </div>
+            <div class="flex justify-between">
+              <dt class="text-stone">Shipping</dt>
+              <dd class="text-charcoal">
+                {{ totals().shipping === 0 ? 'Complimentary' : (totals().shipping | money) }}
+              </dd>
+            </div>
+            @if (totals().discount > 0) {
+              <div class="flex justify-between">
+                <dt class="text-stone">Discount</dt>
+                <dd class="text-clay">−{{ totals().discount | money }}</dd>
+              </div>
+            }
+            <div class="flex justify-between border-t border-ink/10 pt-3 text-base">
+              <dt class="text-ink">Total</dt>
+              <dd class="text-ink">{{ totals().total | money }}</dd>
+            </div>
+          </dl>
+
+          <a routerLink="/checkout" (click)="close()" class="btn-solid mt-6 w-full">
+            Proceed to checkout
+          </a>
+          <a routerLink="/cart" (click)="close()" class="btn-ghost mt-4 w-full justify-center">
+            View bag
+          </a>
+        </footer>
+      }
+    </aside>
+  </div>
+}

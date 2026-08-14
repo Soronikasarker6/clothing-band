@@ -1,0 +1,169 @@
+@import 'tailwindcss';
+
+/* ------------------------------------------------------------------ *
+ *  Maison Atelier — design tokens
+ *  A single source of truth for the showroom's colour, type and motion.
+ *  Everything downstream is expressed as Tailwind utilities.
+ * ------------------------------------------------------------------ */
+@theme {
+  /* Neutral, monochrome-first palette */
+  --color-ink: #0f0f0e;
+  --color-charcoal: #1c1c1a;
+  --color-graphite: #3a3a37;
+  --color-slate: #5c5c57;
+  --color-stone: #8a877f;
+  --color-ash: #b9b5ac;
+  --color-sand: #d9d1c2;
+  --color-linen: #e7e1d6;
+  --color-cream: #f3efe8;
+  --color-paper: #faf8f4;
+  --color-white: #ffffff;
+
+  /* Used sparingly — sale tags and small editorial marks only */
+  --color-clay: #9c5f45;
+
+  --font-display: 'Bodoni Moda', 'Times New Roman', Times, serif;
+  --font-sans: 'Jost Variable', 'Jost', ui-sans-serif, system-ui, -apple-system, 'Segoe UI',
+    Helvetica, Arial, sans-serif;
+
+  /* Editorial display scale */
+  --text-display-sm: 2.25rem;
+  --text-display-sm--line-height: 1.02;
+  --text-display-md: 3.5rem;
+  --text-display-md--line-height: 0.98;
+  --text-display-lg: 5rem;
+  --text-display-lg--line-height: 0.94;
+  --text-display-xl: 7rem;
+  --text-display-xl--line-height: 0.9;
+
+  --tracking-widest: 0.28em;
+
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+
+  --animate-fade-up: fade-up 0.9s var(--ease-editorial) both;
+  --animate-fade-in: fade-in 0.6s var(--ease-editorial) both;
+
+  @keyframes fade-up {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 1.75rem, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-paper text-charcoal font-sans antialiased;
+    font-variant-ligatures: common-ligatures;
+  }
+
+  ::selection {
+    @apply bg-ink text-paper;
+  }
+
+  /* A single, consistent focus treatment across the whole showroom */
+  :focus-visible {
+    @apply outline-2 outline-offset-4 outline-ink;
+  }
+
+  h1,
+  h2,
+  h3 {
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* ------------------------------------------------------------------ *
+ *  Component utilities
+ *  Declared with @utility so they compose with @apply and with Tailwind
+ *  variants (hover:, lg:, …) exactly like built-in utilities.
+ * ------------------------------------------------------------------ */
+
+/* Editorial eyebrow — the small letter-spaced label used above headings */
+@utility eyebrow {
+  @apply font-sans text-[0.6875rem] uppercase tracking-[0.28em] text-stone;
+}
+
+/* Buttons. Deliberately square, thin and typographic. */
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 px-8 py-4 font-sans text-[0.6875rem]
+    uppercase tracking-[0.22em] transition-colors duration-500 ease-[var(--ease-editorial)];
+  &:disabled {
+    @apply pointer-events-none opacity-40;
+  }
+}
+
+@utility btn-solid {
+  @apply btn bg-ink text-paper hover:bg-graphite;
+}
+
+@utility btn-outline {
+  @apply btn border border-ink/25 text-ink hover:border-ink hover:bg-ink hover:text-paper;
+}
+
+@utility btn-light {
+  @apply btn border border-white/45 text-white hover:bg-white hover:text-ink;
+}
+
+@utility btn-ghost {
+  @apply btn px-0 py-2 text-ink underline decoration-ink/25 underline-offset-[6px]
+    hover:decoration-ink;
+}
+
+/* Underline that draws in on hover — used across nav and editorial links */
+@utility link-underline {
+  @apply relative after:absolute after:-bottom-0.5 after:left-0 after:h-px after:w-full
+    after:origin-right after:scale-x-0 after:bg-current after:transition-transform
+    after:duration-500 after:ease-[var(--ease-editorial)] hover:after:origin-left
+    hover:after:scale-x-100;
+}
+
+@utility field {
+  @apply w-full border-0 border-b border-ink/20 bg-transparent px-0 py-3 font-sans text-sm
+    text-ink placeholder:text-stone focus:border-ink focus:outline-none focus:ring-0;
+}
+
+/* Page gutter, shared by every section so vertical edges line up */
+@utility shell {
+  @apply mx-auto w-full max-w-[100rem] px-5 sm:px-8 lg:px-12 xl:px-16;
+}
+
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}

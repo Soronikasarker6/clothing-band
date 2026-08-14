@@ -1,0 +1,118 @@
+@if (open()) {
+  <div class="fixed inset-0 z-[60] lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
+    <button
+      type="button"
+      class="animate-fade-in absolute inset-0 h-full w-full cursor-default bg-ink/40"
+      (click)="close()"
+      aria-label="Close menu"
+    ></button>
+
+    <div
+      id="mobile-menu"
+      class="absolute inset-y-0 left-0 flex w-[86%] max-w-sm flex-col bg-paper
+        motion-safe:animate-[fade-in_0.4s_var(--ease-editorial)_both]"
+    >
+      <div class="flex h-16 items-center justify-between border-b border-ink/10 px-5">
+        <span class="font-display text-base tracking-[0.36em] text-ink">MAISON</span>
+        <button
+          type="button"
+          class="-mr-2 grid h-10 w-10 place-items-center text-ink"
+          (click)="close()"
+          aria-label="Close menu"
+        >
+          <i-lucide [img]="icons.close" class="h-5 w-5" />
+        </button>
+      </div>
+
+      <nav class="flex-1 overflow-y-auto px-5 py-6" aria-label="Mobile">
+        <ul class="space-y-1">
+          @for (item of nav; track item.label) {
+            <li class="border-b border-ink/8">
+              @if (item.columns) {
+                <button
+                  type="button"
+                  class="flex w-full items-center justify-between py-4 text-left font-sans
+                    text-sm uppercase tracking-[0.2em] text-ink"
+                  (click)="toggleSection(item.label)"
+                  [attr.aria-expanded]="expanded() === item.label"
+                >
+                  {{ item.label }}
+                  <i-lucide
+                    [img]="icons.chevronDown"
+                    class="h-4 w-4 transition-transform duration-300"
+                    [class.rotate-180]="expanded() === item.label"
+                  />
+                </button>
+
+                @if (expanded() === item.label) {
+                  <div class="animate-fade-in pb-5">
+                    <a
+                      [routerLink]="item.path"
+                      (click)="close()"
+                      class="mb-4 inline-block font-sans text-xs uppercase tracking-[0.2em]
+                        text-stone underline underline-offset-4"
+                      >Shop all {{ item.label }}</a
+                    >
+                    <ul class="space-y-3">
+                      @for (column of item.columns; track column.title) {
+                        @for (link of column.links; track link.path) {
+                          <li>
+                            <a
+                              [routerLink]="link.path"
+                              (click)="close()"
+                              class="block font-sans text-sm text-charcoal"
+                              >{{ link.label }}</a
+                            >
+                          </li>
+                        }
+                      }
+                    </ul>
+                  </div>
+                }
+              } @else {
+                <a
+                  [routerLink]="item.path"
+                  (click)="close()"
+                  class="block py-4 font-sans text-sm uppercase tracking-[0.2em] text-ink"
+                  >{{ item.label }}</a
+                >
+              }
+            </li>
+          }
+        </ul>
+      </nav>
+
+      <div class="border-t border-ink/10 px-5 py-6">
+        <ul class="space-y-4">
+          <li>
+            <a
+              routerLink="/account"
+              (click)="close()"
+              class="flex items-center gap-3 font-sans text-sm text-charcoal"
+            >
+              <i-lucide [img]="icons.user" class="h-4 w-4" /> Account
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/wishlist"
+              (click)="close()"
+              class="flex items-center gap-3 font-sans text-sm text-charcoal"
+            >
+              <i-lucide [img]="icons.heart" class="h-4 w-4" /> Wishlist
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="/help/shipping"
+              (click)="close()"
+              class="flex items-center gap-3 font-sans text-sm text-charcoal"
+            >
+              <i-lucide [img]="icons.truck" class="h-4 w-4" /> Shipping &amp; returns
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+}

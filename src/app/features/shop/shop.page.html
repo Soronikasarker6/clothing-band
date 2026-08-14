@@ -1,0 +1,70 @@
+<section class="border-b border-ink/10 bg-cream">
+  <div class="shell py-16 lg:py-24">
+    <nav aria-label="Breadcrumb" class="mb-8">
+      <ol class="flex flex-wrap items-center gap-2 font-sans text-[0.6875rem] uppercase tracking-[0.18em] text-stone">
+        <li><a routerLink="/" class="link-underline">Home</a></li>
+        <li aria-hidden="true">/</li>
+        <li class="text-ink">{{ title() }}</li>
+      </ol>
+    </nav>
+
+    <h1 class="font-display text-display-sm uppercase text-ink lg:text-display-md">
+      {{ title() }}
+    </h1>
+    <p class="mt-5 max-w-md font-sans text-base leading-relaxed text-slate">
+      {{ description() }}
+    </p>
+
+    @if (siblingCategories().length > 0) {
+      <ul class="mt-10 flex flex-wrap gap-2">
+        @for (category of siblingCategories(); track category.id) {
+          <li>
+            <a
+              [routerLink]="['/', category.gender, category.slug]"
+              class="inline-block border border-ink/15 px-4 py-2.5 font-sans text-[0.6875rem]
+                uppercase tracking-[0.16em] text-charcoal transition-colors hover:border-ink
+                hover:bg-ink hover:text-paper"
+              >{{ category.name }}</a
+            >
+          </li>
+        }
+      </ul>
+    }
+  </div>
+</section>
+
+<section class="shell py-12 lg:py-16" appReveal>
+  <div class="flex flex-wrap items-center justify-between gap-4 border-b border-ink/10 pb-5">
+    <p class="font-sans text-xs uppercase tracking-[0.18em] text-stone">
+      {{ sorted().length }} {{ sorted().length === 1 ? 'piece' : 'pieces' }}
+    </p>
+
+    <div class="flex items-center gap-3">
+      <label for="sort" class="font-sans text-xs uppercase tracking-[0.18em] text-stone">
+        Sort
+      </label>
+      <select
+        id="sort"
+        class="border-0 border-b border-ink/20 bg-transparent py-2 pr-6 font-sans text-sm
+          text-ink focus:border-ink focus:outline-none"
+        [value]="sort()"
+        (change)="setSort($any($event.target).value)"
+      >
+        @for (option of sortOptions; track option.value) {
+          <option [value]="option.value">{{ option.label }}</option>
+        }
+      </select>
+    </div>
+  </div>
+
+  <div class="mt-12">
+    <app-product-grid
+      [products]="sorted()"
+      [loading]="loading()"
+      [skeletonCount]="8"
+      [eagerFirstRow]="true"
+      emptyTitle="No pieces match this view"
+      emptyBody="Try another category, or browse the full collection."
+    />
+  </div>
+</section>

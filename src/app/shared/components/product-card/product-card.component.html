@@ -1,0 +1,115 @@
+<article class="group relative">
+  <div class="relative overflow-hidden bg-cream">
+    <a
+      [routerLink]="link()"
+      class="block focus-visible:outline-offset-[-4px]"
+      [attr.aria-label]="product().name"
+    >
+      <div class="relative aspect-[3/4] w-full">
+        <img
+          [src]="primaryImage().url"
+          [alt]="primaryImage().alt"
+          [attr.loading]="priority() ? 'eager' : 'lazy'"
+          [attr.fetchpriority]="priority() ? 'high' : 'auto'"
+          decoding="async"
+          [appImageFallback]="product().slug + '-1'"
+          class="absolute inset-0 h-full w-full object-cover transition-all duration-[900ms]
+            ease-[var(--ease-editorial)] group-hover:scale-[1.04] group-hover:opacity-0"
+        />
+        <img
+          [src]="hoverImage().url"
+          [alt]="hoverImage().alt"
+          loading="lazy"
+          decoding="async"
+          aria-hidden="true"
+          [appImageFallback]="product().slug + '-2'"
+          class="absolute inset-0 h-full w-full scale-[1.04] object-cover opacity-0 transition-all
+            duration-[900ms] ease-[var(--ease-editorial)] group-hover:scale-100
+            group-hover:opacity-100"
+        />
+      </div>
+    </a>
+
+    <!-- Status marks -->
+    <div class="pointer-events-none absolute left-0 top-0 flex flex-col items-start gap-px p-4">
+      @if (soldOut()) {
+        <span class="bg-ink px-3 py-1.5 font-sans text-[0.625rem] uppercase tracking-[0.2em] text-paper">
+          Sold out
+        </span>
+      } @else if (onSale()) {
+        <span class="bg-clay px-3 py-1.5 font-sans text-[0.625rem] uppercase tracking-[0.2em] text-white">
+          Sale
+        </span>
+      } @else if (product().isNew) {
+        <span class="bg-paper/90 px-3 py-1.5 font-sans text-[0.625rem] uppercase tracking-[0.2em] text-ink">
+          New
+        </span>
+      }
+    </div>
+
+    <!-- Wishlist -->
+    <button
+      type="button"
+      (click)="toggleWishlist($event)"
+      [attr.aria-pressed]="saved()"
+      [attr.aria-label]="(saved() ? 'Remove ' : 'Save ') + product().name + ' to wishlist'"
+      class="absolute right-3 top-3 grid h-10 w-10 place-items-center rounded-full bg-paper/80
+        text-ink backdrop-blur-sm transition-all duration-500 ease-[var(--ease-editorial)]
+        hover:bg-paper sm:opacity-0 sm:group-hover:opacity-100 sm:focus-visible:opacity-100"
+      [class]="saved() ? 'sm:opacity-100' : ''"
+    >
+      <i-lucide
+        [img]="icons.heart"
+        [class]="saved() ? 'h-4 w-4 fill-ink text-ink' : 'h-4 w-4 text-ink'"
+      />
+    </button>
+
+    <!-- Quick view -->
+    <div
+      class="pointer-events-none absolute inset-x-0 bottom-0 hidden translate-y-full p-3 opacity-0
+        transition-all duration-500 ease-[var(--ease-editorial)] group-hover:pointer-events-auto
+        group-hover:translate-y-0 group-hover:opacity-100 sm:block"
+    >
+      <button
+        type="button"
+        (click)="openQuickView($event)"
+        class="w-full bg-paper/95 py-3.5 font-sans text-[0.625rem] uppercase tracking-[0.22em]
+          text-ink backdrop-blur-sm transition-colors hover:bg-ink hover:text-paper"
+      >
+        Quick view
+      </button>
+    </div>
+  </div>
+
+  <div class="mt-5 flex flex-col gap-1.5">
+    <p class="eyebrow">{{ product().categoryName }}</p>
+
+    <h3 class="font-sans text-[0.9375rem] leading-snug text-ink">
+      <a [routerLink]="link()" class="link-underline">{{ product().name }}</a>
+    </h3>
+
+    <div class="flex items-baseline gap-2.5 font-sans text-sm">
+      @if (onSale()) {
+        <span class="text-clay">{{ price() | money }}</span>
+        <span class="text-stone line-through">{{ product().price | money }}</span>
+      } @else {
+        <span class="text-charcoal">{{ price() | money }}</span>
+      }
+    </div>
+
+    @if (product().colors.length > 1) {
+      <div class="mt-1.5 flex items-center gap-1.5">
+        @for (color of product().colors; track color.id) {
+          <span
+            class="h-2.5 w-2.5 rounded-full ring-1 ring-ink/12 ring-inset"
+            [style.background-color]="color.swatch"
+            [attr.title]="color.name"
+          ></span>
+        }
+        <span class="sr-only">
+          Available in {{ product().colors.length }} colours
+        </span>
+      </div>
+    }
+  </div>
+</article>

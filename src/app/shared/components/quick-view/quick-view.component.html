@@ -1,0 +1,89 @@
+@if (product(); as current) {
+  <div class="fixed inset-0 z-[65]" role="dialog" aria-modal="true" aria-label="Product quick view">
+    <button
+      type="button"
+      class="absolute inset-0 h-full w-full cursor-default bg-ink/45 backdrop-blur-[2px]"
+      (click)="close()"
+      aria-label="Close quick view"
+    ></button>
+
+    <div
+      class="animate-fade-up absolute inset-x-0 bottom-0 max-h-[92dvh] overflow-y-auto bg-paper
+        sm:inset-0 sm:m-auto sm:h-fit sm:max-w-4xl"
+    >
+      <button
+        type="button"
+        class="absolute right-4 top-4 z-10 grid h-10 w-10 place-items-center text-ink
+          transition-colors hover:bg-cream"
+        (click)="close()"
+        aria-label="Close quick view"
+      >
+        <i-lucide [img]="icons.close" class="h-4 w-4" />
+      </button>
+
+      <div class="grid gap-0 sm:grid-cols-2">
+        @if (image(); as shot) {
+          <div class="aspect-[4/5] w-full bg-cream sm:aspect-[3/4]">
+            <img
+              [src]="shot.url"
+              [alt]="shot.alt"
+              [appImageFallback]="current.slug + '-1'"
+              class="h-full w-full object-cover"
+            />
+          </div>
+        }
+
+        <div class="flex flex-col gap-6 p-6 sm:p-10">
+          <div>
+            <p class="eyebrow">{{ current.categoryName }}</p>
+            <h2 class="mt-3 font-display text-3xl leading-tight text-ink">{{ current.name }}</h2>
+            <div class="mt-3 flex items-center gap-4">
+              <span class="font-sans text-base text-charcoal">
+                {{ (current.salePrice ?? current.price) | money }}
+              </span>
+              @if (current.salePrice) {
+                <span class="font-sans text-sm text-stone line-through">
+                  {{ current.price | money }}
+                </span>
+              }
+              <app-rating [value]="current.rating" [reviewCount]="current.reviewCount" />
+            </div>
+          </div>
+
+          <p class="font-sans text-sm leading-relaxed text-slate">{{ current.description }}</p>
+
+          <app-color-selector
+            [colors]="current.colors"
+            [(selected)]="color"
+            legend="Colour"
+          />
+
+          <app-size-selector
+            [sizes]="current.sizes"
+            [(selected)]="size"
+            [unavailable]="unavailableSizes()"
+            [showGuide]="false"
+          />
+
+          <div class="mt-auto flex flex-col gap-3">
+            <button
+              type="button"
+              class="btn-solid w-full"
+              [disabled]="!size()"
+              (click)="addToCart()"
+            >
+              {{ size() ? 'Add to bag' : 'Select a size' }}
+            </button>
+            <a
+              [routerLink]="['/product', current.slug]"
+              (click)="close()"
+              class="btn-outline w-full"
+            >
+              View full details
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
