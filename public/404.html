@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Redirecting...</title>
+  <script>
+    // Redirect all 404s to the index.html with the path preserved as a query parameter
+    const path = window.location.pathname;
+    const base = '/clothing-band';
+    
+    // Only redirect if the path doesn't start with the base path
+    if (!path.startsWith(base + '/')) {
+      // Preserve the full path and redirect to index.html
+      const redirectPath = path + window.location.search;
+      window.location.replace(base + '/?redirect=' + encodeURIComponent(redirectPath));
+    }
+  </script>
+</head>
+<body>
+  <p>Redirecting...</p>
+</body>
+</html>
