@@ -14,8 +14,19 @@ export type MediaSource = 'local' | 'unsplash' | 'cdn';
 
 export const MEDIA_SOURCE: MediaSource = 'local';
 
-/** Root for bundled assets. */
-const LOCAL_ROOT = '/media';
+/**
+ * Root for bundled assets, resolved against the app's `<base href>` at runtime.
+ *
+ * A hardcoded `/media` only works when the app is served from the domain root. This
+ * app is also deployed to GitHub Pages under a sub-path (`/clothing-band/`), where an
+ * absolute `/media/...` request 404s against the domain root instead of hitting the
+ * files actually deployed under the sub-path. Reading `<base href>` keeps this correct
+ * in both places without hardcoding the repo name here.
+ */
+function localRoot(): string {
+  const base = typeof document === 'undefined' ? '/' : (document.querySelector('base')?.getAttribute('href') ?? '/');
+  return `${base.replace(/\/$/, '')}/media`;
+}
 
 /** Root for a future CDN / Laravel `storage/app/public` origin. */
 const CDN_ROOT = '';
@@ -61,10 +72,10 @@ export function media(key: string, options: MediaOptions = {}): string {
   if (MEDIA_SOURCE === 'cdn' && CDN_ROOT) {
     return `${CDN_ROOT}/${key}.jpg`;
   }
-  return `${LOCAL_ROOT}/${key}.jpg`;
+  return `${localRoot()}/${key}.jpg`;
 }
 
 /** Bundled study used whenever a remote image fails to load. */
 export function mediaFallback(key: string): string {
-  return `${LOCAL_ROOT}/${key}.jpg`;
+  return `${localRoot()}/${key}.jpg`;
 }
