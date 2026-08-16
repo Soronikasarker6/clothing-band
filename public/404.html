@@ -5,16 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Redirecting...</title>
   <script>
-    // Redirect all 404s to the index.html with the path preserved as a query parameter
+    // GitHub Pages serves this file for any path it can't find on disk — which, for a
+    // single-page app, is every deep link and every hard refresh (e.g. /clothing-band/shop).
+    // Redirect to the app root with the original path preserved as a query param, so the
+    // Angular router (see app.ts) can restore it after bootstrap.
     const path = window.location.pathname;
     const base = '/clothing-band';
-    
-    // Only redirect if the path doesn't start with the base path
-    if (!path.startsWith(base + '/')) {
-      // Preserve the full path and redirect to index.html
-      const redirectPath = path + window.location.search;
-      window.location.replace(base + '/?redirect=' + encodeURIComponent(redirectPath));
-    }
+    const appPath = path.startsWith(base) ? path.slice(base.length) : path;
+    const redirectPath = (appPath || '/') + window.location.search;
+    window.location.replace(base + '/?redirect=' + encodeURIComponent(redirectPath));
   </script>
 </head>
 <body>

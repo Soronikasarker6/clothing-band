@@ -58,6 +58,13 @@ export class App {
   protected readonly mainPadding = computed(() => (this.url() === '/' ? '' : 'pt-16 lg:pt-20'));
 
   constructor() {
+    // GitHub Pages has no server-side rewrites, so public/404.html redirects hard-refreshed
+    // deep links here as `?redirect=<original path>`. Restore the real route once, up front.
+    const redirect = new URLSearchParams(window.location.search).get('redirect');
+    if (redirect) {
+      this.router.navigateByUrl(redirect, { replaceUrl: true });
+    }
+
     this.router.events
       .pipe(
         filter((event): event is NavigationEnd => event instanceof NavigationEnd),
