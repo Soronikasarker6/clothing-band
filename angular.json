@@ -38,6 +38,7 @@
           },
           "configurations": {
             "production": {
+              "baseHref": "/clothing-band/",
               "fileReplacements": [
                 {
                   "replace": "src/environments/environment.ts",
