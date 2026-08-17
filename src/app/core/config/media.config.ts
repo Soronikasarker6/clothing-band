@@ -101,8 +101,8 @@ const UNSPLASH_IDS: Readonly<Record<string, string>> = {
   'high-rise-wide-trouser-2': 'photo-1621767527617-9f20f14c952c',
   'straight-leg-jean-1': 'photo-1598554747436-c9293d6a588f',
   'straight-leg-jean-2': 'photo-1758018230837-89188346c36f',
-  'pleated-midi-skirt-1': 'photo-1603659752441-8b43d7f49f2c',
-  'pleated-midi-skirt-2': 'photo-1593129747951-db31f82963da',
+  'pleated-midi-skirt-1': 'photo-1593129747951-db31f82963da',
+  'pleated-midi-skirt-2': 'photo-1603659752441-8b43d7f49f2c',
 
   // Women — dresses & outerwear
   'bias-cut-midi-dress-1': 'photo-1624278268402-5d627eb9476a',
